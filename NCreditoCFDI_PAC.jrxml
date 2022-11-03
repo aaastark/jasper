@@ -27,8 +27,12 @@ devcatidaletra as totalletra, (devsubtotal-devdescuento) as subtotal, devivacant
 cad.cadena, sello, no_aprobacion as noAprobacion, ano_aprobacion as anoAprobacion, no_serie, devdescuento as descuento,
 devporcientodescuento as motivo_descuento, dev_met_pago as metodo_pago, c.cusid as id_cliente, numnotacredito as folio_interno,
 dev_num_cuenta as facNumCtaPago, dev_banco as facBanco, uuid, devno2 as no_devolucion, dev_aplicada as doc_afectado,
-to_char(c.devfecha, 'DD') || '/' || to_char(c.devfecha, 'MM') || '/' || to_char(c.devfecha, 'YYYY') as fdev
+to_char(c.devfecha, 'DD') || '/' || to_char(c.devfecha, 'MM') || '/' || to_char(c.devfecha, 'YYYY') as fdev,
+uc."Descripcion" as uso_cfdi, r.descripcion as regimen_fiscal_receptor
 FROM devoluciones1 c INNER JOIN detalledevolucion df on c.devid = df.devid
+	inner join "uso_de_CFDI" uc on c.uso_cfdi = uc."UsoCFDI"
+	inner join customer cus on c.cusid = cus.cusid
+	inner join regimenfiscal r on r.cveregimen = cus.regimen_fiscal_receptor
            INNER JOIN productos prod on df.procodigo = prod.procodigo
 	   INNER JOIN cadena cad on c.devid = cad.fac_id
 	   INNER JOIN sellodigital sd on cad.id_cadena = sd.id_cadena
@@ -36,6 +40,9 @@ FROM devoluciones1 c INNER JOIN detalledevolucion df on c.devid = df.devid
 	   CROSS JOIN certificado cert
 WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.dev_serie = 'NC' and cad.cad_serie='NC' ORDER BY df.procodigo]]>
 	</queryString>
+	<field name="unidad" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<field name="no_folio" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
@@ -69,22 +76,22 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 	<field name="cantidad" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="precio" class="java.lang.Float">
+	<field name="precio" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="total" class="java.lang.Float">
+	<field name="total" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="totalletra" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="subtotal" class="java.lang.Float">
+	<field name="subtotal" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="totalit" class="java.lang.Float">
+	<field name="totalit" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="totalcfd" class="java.lang.Float">
+	<field name="totalcfd" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="cadena" class="java.lang.String">
@@ -93,28 +100,22 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 	<field name="sello" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="noAprobacion" class="java.lang.Integer">
+	<field name="noaprobacion" class="java.lang.Long">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="anoAprobacion" class="java.lang.Integer">
+	<field name="anoaprobacion" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="no_serie" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="fdev" class="java.lang.String">
+	<field name="descuento" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="no_devolucion" class="java.lang.Integer">
+	<field name="motivo_descuento" class="java.lang.Double">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="doc_afectado" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="descuento" class="java.lang.Float">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
-	<field name="motivo_descuento" class="java.lang.String">
+	<field name="metodo_pago" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="id_cliente" class="java.lang.Integer">
@@ -123,11 +124,30 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 	<field name="folio_interno" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="metodo_pago" class="java.lang.String"/>
-	<field name="unidad" class="java.lang.String"/>
-	<field name="facBanco" class="java.lang.String"/>
-	<field name="facNumCtaPago" class="java.lang.String"/>
-	<field name="uuid" class="java.lang.String"/>
+	<field name="facnumctapago" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="facbanco" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="uuid" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="no_devolucion" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="doc_afectado" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="fdev" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="uso_cfdi" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="regimen_fiscal_receptor" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<background>
 		<band height="792" splitType="Prevent">
 			<rectangle>
@@ -233,26 +253,30 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<text><![CDATA[RENTA Y VENTA DE ANDAMIOS Y EQUIPO PARA LA CONSTRUCCIÓN]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="88" y="65" width="501" height="10"/>
+				<reportElement x="96" y="65" width="490" height="10"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
-				<text><![CDATA[KM 1.5 CARR. FED. PUEBLA-ATLIXCO, COL. CONCEPCIÓN LA CRUZ,  PUEBLA, PUE, MÉXICO C.P. 72190]]></text>
+				<text><![CDATA[BOULEVARD ATLIXCO, COL. CONCEPCIÓN LA CRUZ,  HEROICA PUEBLA DE ZARAGOZA, PUE, MÉXICO, CP:72197      ventas@ancopsa.com]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="88" y="75" width="501" height="13"/>
+				<reportElement x="95" y="80" width="324" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
+					<font size="9" isBold="false"/>
 				</textElement>
-				<text><![CDATA[ Tels. (222)284-5379, 284-7209, 284-8583       ventas@ancopsa.com]]></text>
+				<text><![CDATA[RFC: ACP9403105HA REGIMEN FISCAL: GENERAL DE LEY PERSONAS MORALES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="409" y="80" width="192" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ TELS. (222)284-5379, 284-7209, 284-8583]]></text>
 			</staticText>
 		</band>
 	</title>
 	<pageHeader>
 		<band height="133" splitType="Stretch">
-			<rectangle radius="10">
-				<reportElement x="23" y="1" width="330" height="73" backcolor="#FFFFFF"/>
-			</rectangle>
 			<rectangle radius="10">
 				<reportElement x="414" y="1" width="168" height="73" backcolor="#FFFFFF"/>
 			</rectangle>
@@ -438,26 +462,54 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{id_cliente}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="34" y="12" width="316" height="48"/>
+				<reportElement x="34" y="12" width="316" height="30"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DatosCte}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="61" y="60" width="289" height="12"/>
+				<reportElement x="61" y="49" width="289" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{RFC}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="34" y="60" width="28" height="11"/>
+				<reportElement x="34" y="49" width="28" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[R.F.C.]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="35" y="41" width="42" height="11"/>
+				<textElement>
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[USO CFDI:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="79" y="40" width="100" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uso_cfdi}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="59" width="46" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Regimen F.:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="68" y="59" width="283" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{regimen_fiscal_receptor}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
@@ -484,7 +536,7 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{precio}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{precio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="27" y="1" width="34" height="12"/>
@@ -498,7 +550,7 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{total}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="104" y="1" width="219" height="12"/>
@@ -532,9 +584,6 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				</textElement>
 				<text><![CDATA[Banco:]]></text>
 			</staticText>
-			<rectangle radius="10">
-				<reportElement x="499" y="1" width="86" height="18" backcolor="#FFFFFF"/>
-			</rectangle>
 			<staticText>
 				<reportElement x="413" y="21" width="77" height="12"/>
 				<textElement>
@@ -563,13 +612,6 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				</textElement>
 				<text><![CDATA[NOMBRE Y FIRMA AUTORIZADA]]></text>
 			</staticText>
-			<textField pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement x="505" y="5" width="74" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{descuento}]]></textFieldExpression>
-			</textField>
 			<textField>
 				<reportElement x="232" y="87" width="340" height="25"/>
 				<textElement>
@@ -585,14 +627,7 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{totalit}]]></textFieldExpression>
-			</textField>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="412" y="5" width="87" height="12"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{motivo_descuento}.equals( null ) ? "DESCUENTO 0.0%" :"DESCUENTO "+$F{motivo_descuento}+"%"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{totalit}]]></textFieldExpression>
 			</textField>
 			<rectangle radius="10">
 				<reportElement x="498" y="18" width="86" height="18" backcolor="#FFFFFF"/>
@@ -605,7 +640,7 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{subtotal}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{subtotal}]]></textFieldExpression>
 			</textField>
 			<rectangle radius="10">
 				<reportElement x="497" y="55" width="86" height="18" backcolor="#FFFFFF"/>
@@ -704,11 +739,6 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				</textElement>
 				<text><![CDATA[Este documento es una representación impresa de un CFDI]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="416" y="201" width="185" height="15"/>
-				<textElement/>
-				<text><![CDATA[Persona Moral Régimen General]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="232" y="164" width="347" height="30"/>
 				<textElement>
@@ -730,13 +760,6 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{sello}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="306" y="199" width="109" height="15"/>
-				<textElement>
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Régimen Fiscal:]]></text>
-			</staticText>
 			<staticText>
 				<reportElement x="232" y="76" width="329" height="10"/>
 				<textElement>
@@ -775,22 +798,8 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement>
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{facNumCtaPago}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{facnumctapago}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="139" y="225" width="26" height="11"/>
-				<textElement>
-					<font size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[RFC:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="184" y="233" width="83" height="11"/>
-				<textElement>
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[ACP-940310-5HA]]></text>
-			</staticText>
 			<staticText>
 				<reportElement x="139" y="206" width="81" height="11"/>
 				<textElement>
@@ -803,37 +812,50 @@ WHERE datf.activo = '1' and cert.activo = 1 and  c.devid = $P{id_factura} and c.
 				<textElement>
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{facBanco}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{facbanco}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement x="503" y="59" width="74" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Float"><![CDATA[$F{totalcfd}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{totalcfd}]]></textFieldExpression>
 			</textField>
 			<rectangle radius="10">
 				<reportElement x="23" y="38" width="386" height="33" backcolor="#FFFFFF"/>
 			</rectangle>
-		</band>
-	</columnFooter>
-	<pageFooter>
-		<band height="18" splitType="Stretch">
-			<textField evaluationTime="Report">
-				<reportElement x="542" y="-12" width="37" height="11"/>
-				<textElement>
-					<font size="8"/>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="510" y="-49" width="75" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["LISTA "+$F{motivo_descuento}+""]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="141" y="234" width="102" height="11"/>
+				<textElement>
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[OBJETO DE IMPUESTO 02]]></text>
+			</staticText>
 			<textField>
-				<reportElement x="462" y="-12" width="80" height="11"/>
+				<reportElement x="462" y="264" width="80" height="11"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="542" y="264" width="37" height="11"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
 		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="18" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
 		<band/>
