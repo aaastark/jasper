@@ -27,13 +27,13 @@ else (faccantidad * facprecio * facdias)
 end  as  total,
 faccatidaletra as totalletra, (facsubtotal-facdescuento) as subtotal, facivacantidad as totalit, factotal AS totalcfd,
 cad.cadena, sello, no_aprobacion as noAprobacion, ano_aprobacion as anoAprobacion, no_serie, facdescuento as descuento,
-renporcientodescuento as motivo_descuento, fac_met_pago as metodo_pago, c.cusid as id_cliente, facno as folio_interno,
+fac_listado as motivo_descuento, fac_met_pago as metodo_pago, c.cusid as id_cliente, facno as folio_interno,
 fac_num_cta_pago as facNumCtaPago , fac_banco as facBanco, uuid,  fac_forma_pago as forma_pago,
 case when facdias is null then ((faccantidad * facprecio) * 0.16)
 else ((faccantidad * facprecio * facdias) * 0.16)
 end  as  ivas, uc."Descripcion" as uso_cfdi, r.descripcion as regimen_fiscal_receptor
 FROM Factura c INNER JOIN detallefactura df on c.facid = df.facid
- inner join renta ren on ren.renid = c.renid
+ /*inner join renta ren on ren.renid = c.renid*/
  inner join "uso_de_CFDI" uc on c.uso_cfdi = uc."UsoCFDI"
 	inner join customer cus on c.cusid = cus.cusid
         inner join regimenfiscal r on r.cveregimen = cus.regimen_fiscal_receptor
